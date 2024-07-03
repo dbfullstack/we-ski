@@ -44,7 +44,6 @@ const SearchPage = () => {
             fromDate,
             toDate,
             groupSize,
-            clientId: Date.now(),
         });
     };
 
