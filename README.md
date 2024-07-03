@@ -1,6 +1,6 @@
-# We-Ski Trip Planner
+# We Ski - Plan Your Trip
 
-The **We-Ski Trip Planner** is a web application designed to help users search for ski accommodations across various destinations. It integrates multiple APIs to provide comprehensive search results based on user preferences.
+The **We Ski - Plan Your Trip** is a web application designed to help users search for ski accommodations across various destinations. It integrates multiple APIs to provide comprehensive search results based on user preferences.
 
 ## Features
 
