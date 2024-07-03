@@ -14,6 +14,10 @@ const SearchPage = () => {
     const [hotels, setHotels] = useState([]);
     const [searchButtonDisabled, setSearchButtonDisabled] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [noResults, setNoResults] = useState(false);
+
+    let currentSearchId = 0;
+    let searchTimeout = null;
 
     useEffect(() => {
         fetchDestinations();
@@ -39,12 +43,25 @@ const SearchPage = () => {
 
     const handleSearch = () => {
         setLoading(true);
+        setHotels([]);
+        setNoResults(false);
+        currentSearchId++;
+        const currentId = currentSearchId;
+
         socket.emit('search', {
+            searchId: currentId,
             skiSite: destination,
             fromDate,
             toDate,
             groupSize,
         });
+
+        searchTimeout = setTimeout(() => {
+            if (hotels.length === 0) {
+                setNoResults(true);
+                setLoading(false);
+            }
+        }, 30000);
     };
 
     useEffect(() => {
@@ -53,11 +70,13 @@ const SearchPage = () => {
         return () => {
             socket.off('newResults', handleNewResults);
         };
-    }, []);
+    });
 
     const handleNewResults = (newHotels) => {
         setLoading(false);
-        setHotels(prevHotels => [...prevHotels, ...newHotels].sort((a, b) => a.price - b.price));
+        clearTimeout(searchTimeout);
+        setHotels(newHotels);
+        setNoResults(false);
     };
 
     return (
@@ -96,6 +115,7 @@ const SearchPage = () => {
                     </button>
                 </div>
                 <div className='results'>
+                    {noResults && <p>No results found</p>}
                     {hotels.length > 0 && (
                         <ul>
                             {hotels.map((hotel) => (
@@ -104,7 +124,7 @@ const SearchPage = () => {
                                     <p>Price: £{hotel.PricesInfo.AmountAfterTax}</p>
                                     <p>Rating: {hotel.HotelInfo.Rating}</p>
                                     <p>Beds: {hotel.HotelInfo.Beds}</p>
-                                    <img src={hotel.HotelDescriptiveContent.Images[0]?.URL} alt={hotel.HotelName} />
+                                    <img src={hotel.HotelDescriptiveContent.Images[0]?.URL} />
                                 </li>
                             ))}
                         </ul>
